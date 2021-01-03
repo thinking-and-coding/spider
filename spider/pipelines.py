@@ -15,8 +15,9 @@ class DoubanPipeline(object):
 
     def close_spider(self, spider):
         # 删除最后一个字符
-        print(self.file.tell())
-        self.file.seek(self.file.tell() - 2)
+        cursor = self.file.tell()
+        if cursor > 3:
+            self.file.seek(self.file.tell() - 2)
         # 构造json格式数组
         self.file.write(']')
         self.file.close()

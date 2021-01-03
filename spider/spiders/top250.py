@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import scrapy
-
 from spider.items import DoubanItem
 
 

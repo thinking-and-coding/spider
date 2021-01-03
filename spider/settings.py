@@ -65,7 +65,8 @@ DOWNLOAD_DELAY = 0
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'spider.pipelines.DoubanPipeline': 300,
+    #'spider.pipelines.DoubanPipeline': 300,
+    'spider.pipelines.DoubanBookPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

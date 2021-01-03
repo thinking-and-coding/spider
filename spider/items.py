@@ -24,3 +24,20 @@ class DoubanItem(Item):
     comments = Field()
     # 总结
     quota = Field()
+
+class DoubanBookItem(Item):
+    # define the fields for your item here like:
+    # 图书标题
+    title = Field()
+    # 图书封面
+    pic = Field()
+    # 图书链接
+    link = Field()
+    # 作者
+    author = Field()
+    # 评分
+    score = Field()
+    # 评论数
+    comments = Field()
+    # 总结
+    quota = Field()

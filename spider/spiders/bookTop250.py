@@ -28,8 +28,7 @@ class Booktop250Spider(scrapy.Spider):
             next_url = response.urljoin(next_url)
             yield scrapy.Request(url=next_url, callback=self.parse, dont_filter=True)
 
-        # 格式化字符串，替换html格式空格同时去掉前后空格
-
+    # 格式化字符串，替换html格式空格同时去掉前后空格
     @staticmethod
     def fomatStr(str):
         if str is not None:

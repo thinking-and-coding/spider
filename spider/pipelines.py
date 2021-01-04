@@ -5,6 +5,11 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import json
+from os.path import join, basename, dirname
+from urllib.parse import urlparse
+
+import scrapy
+from scrapy.pipelines.files import FilesPipeline
 
 
 class DoubanPipeline(object):
@@ -51,3 +56,13 @@ class DoubanBookPipeline(object):
         line = json.dumps(item, ensure_ascii=False) + ',\n'
         self.file.write(line)
         return item
+
+
+class pdfPipeline(FilesPipeline):
+    def get_media_requests(self, item, info):
+        yield scrapy.Request(item['link'], meta={'title': item['title']})
+
+    def file_path(self, request, response=None, info=None):
+        path = urlparse(request.url).path
+        print("|->path:", path)
+        return join(basename(dirname(path)), basename(path))

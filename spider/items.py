@@ -41,3 +41,10 @@ class DoubanBookItem(Item):
     comments = Field()
     # 总结
     quota = Field()
+
+class pdfItem(Item):
+    # define the fields for your item here like:
+    # pdf标题
+    title = Field()
+    # pdf链接
+    link = Field()

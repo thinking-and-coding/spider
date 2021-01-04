@@ -16,7 +16,7 @@ NEWSPIDER_MODULE = 'spider.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36'
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -39,10 +39,11 @@ DOWNLOAD_DELAY = 0
 #TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-#DEFAULT_REQUEST_HEADERS = {
-#   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-#   'Accept-Language': 'en',
-#}
+DEFAULT_REQUEST_HEADERS = {
+    'Accept': '*/*',
+    'Accept-Language': 'zh',
+    'Cookie': '__cfduid=d91a02f11c7ffb5f5095ff314a0881e171609764833'
+}
 
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
@@ -66,7 +67,8 @@ DOWNLOAD_DELAY = 0
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     #'spider.pipelines.DoubanPipeline': 300,
-    'spider.pipelines.DoubanBookPipeline': 300,
+    #'spider.pipelines.DoubanBookPipeline': 300,
+    'spider.pipelines.pdfPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -87,5 +89,8 @@ ITEM_PIPELINES = {
 #HTTPCACHE_ENABLED = True
 #HTTPCACHE_EXPIRATION_SECS = 0
 #HTTPCACHE_DIR = 'httpcache'
-#HTTPCACHE_IGNORE_HTTP_CODES = []
+HTTPCACHE_IGNORE_HTTP_CODES = [403]
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# 文件下载路径
+FILES_STORE = './Download/pdf'

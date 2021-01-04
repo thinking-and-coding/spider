@@ -39,11 +39,11 @@ DOWNLOAD_DELAY = 0
 #TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-DEFAULT_REQUEST_HEADERS = {
-    'Accept': '*/*',
-    'Accept-Language': 'zh',
-    'Cookie': '__cfduid=d91a02f11c7ffb5f5095ff314a0881e171609764833'
-}
+#DEFAULT_REQUEST_HEADERS = {
+#    'Accept': '*/*',
+#    'Accept-Language': 'zh',
+#    'Cookie': '__cfduid=d91a02f11c7ffb5f5095ff314a0881e171609764833'
+#}
 
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html

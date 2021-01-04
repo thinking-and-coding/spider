@@ -5,6 +5,7 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import json
+import urllib
 from os.path import join, basename, dirname
 from urllib.parse import urlparse
 
@@ -62,7 +63,10 @@ class pdfPipeline(FilesPipeline):
     def get_media_requests(self, item, info):
         yield scrapy.Request(item['link'], meta={'title': item['title']})
 
-    def file_path(self, request, response=None, info=None):
-        path = urlparse(request.url).path
-        print("|->path:", path)
-        return join(basename(dirname(path)), basename(path))
+    def file_path(self, request, response=None, info=None, *, item=None):
+        encode_path = urlparse(request.url).path
+        decode_path = urllib.request.unquote(encode_path)
+        print("|->decodePath:", decode_path)
+        #return join(basename(dirname(decode_path)), basename(decode_path))
+        # 此处直接返回文件名
+        return basename(decode_path)

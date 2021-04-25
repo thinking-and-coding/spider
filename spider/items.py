@@ -48,3 +48,24 @@ class pdfItem(Item):
     title = Field()
     # pdf链接
     link = Field()
+
+class MavenItem(Item):
+    # define the fields for your item here like:
+    # 名称
+    name = Field()
+    # 描述
+    description = Field()
+    # 使用数
+    usages = Field()
+    # 链接
+    link = Field()
+    # 许可证
+    license = Field()
+    # 类别
+    categories = Field()
+    # 标签
+    tags = Field()
+    # maven坐标
+    mavenSite = Field()
+    # 被引列表
+    usedByList = Field()

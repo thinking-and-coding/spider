@@ -16,18 +16,18 @@ NEWSPIDER_MODULE = 'spider.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36'
+USER_AGENT = 'Mozilla/5.0 (Windows NT 5.1; rv:5.0) Gecko/20100101 Firefox/5.0'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 1
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 0
+DOWNLOAD_DELAY = 10
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
@@ -39,11 +39,12 @@ DOWNLOAD_DELAY = 0
 #TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-#DEFAULT_REQUEST_HEADERS = {
+DEFAULT_REQUEST_HEADERS = {
 #    'Accept': '*/*',
 #    'Accept-Language': 'zh',
 #    'Cookie': '__cfduid=d91a02f11c7ffb5f5095ff314a0881e171609764833'
-#}
+    'refer':'https://mvnrepository.com/'
+}
 
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
@@ -68,7 +69,9 @@ DOWNLOAD_DELAY = 0
 ITEM_PIPELINES = {
     #'spider.pipelines.DoubanPipeline': 300,
     #'spider.pipelines.DoubanBookPipeline': 300,
-    'spider.pipelines.pdfPipeline': 300,
+    #'spider.pipelines.pdfPipeline': 300,
+    #'spider.pipelines.pdfPipeline': 300,
+    'spider.pipelines.mavenPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

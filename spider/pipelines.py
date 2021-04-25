@@ -70,3 +70,26 @@ class pdfPipeline(FilesPipeline):
         #return join(basename(dirname(decode_path)), basename(decode_path))
         # 此处直接返回文件名
         return basename(decode_path)
+
+class mavenPipeline(FilesPipeline):
+    def open_spider(self, spider):
+        self.file = open('maven.json', 'w+')
+        # 构造json格式数组
+        self.file.write('[')
+
+    def close_spider(self, spider):
+        # 删除最后一个字符
+        cursor = self.file.tell()
+        if cursor > 3:
+            self.file.seek(self.file.tell() - 2)
+        # 构造json格式数组
+        self.file.write(']')
+        self.file.close()
+
+    def process_item(self, item, spider):
+        item = dict(item)
+        print("|->artifact.name:", item.get('name'))
+        print("|->artifact.usedBy:", item.get('usedBy'))
+        line = json.dumps(item, ensure_ascii=False) + ',\n'
+        self.file.write(line)
+        return item

@@ -10,7 +10,7 @@ class PdfSpider(scrapy.Spider):
     allowed_domains = ['yun.weicheng.men']
     start_urls = ['https://yun.weicheng.men/?dir=Book']
 
-    def parse(self, response):
+    def parse(self, response, **kwargs):
         # 解析内容
         file_list = response.xpath('//li[position()>1]')
         for file in file_list:

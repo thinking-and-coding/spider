@@ -10,7 +10,7 @@ class Top250Spider(scrapy.Spider):
     allowed_domains = ['movie.douban.com/top250']
     start_urls = ['https://movie.douban.com/top250']
 
-    def parse(self, response):
+    def parse(self, response, **kwargs):
         # 解析内容
         movie_list = response.xpath('//*[@class="item"]')
         for movie in movie_list:

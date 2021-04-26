@@ -11,7 +11,7 @@ class MavenSpider(scrapy.Spider):
     start_urls = ['https://mvnrepository.com/popular']
     detail_url_prefix = 'https://mvnrepository.com/'
 
-    def parse(self, response):
+    def parse(self, response, **kwargs):
         # 解析内容
         artifactory_list = response.xpath('//div[@class="im"]')
         for artifactory in artifactory_list:

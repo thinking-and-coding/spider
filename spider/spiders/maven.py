@@ -9,7 +9,7 @@ class MavenSpider(scrapy.Spider):
     name = 'maven'
     allowed_domains = ['mvnrepository.com']
     start_urls = ['https://mvnrepository.com/popular']
-    detail_url_prefix = 'https://mvnrepository.com/'
+    detail_url_prefix = 'https://mvnrepository.com'
 
     def parse(self, response, **kwargs):
         # 解析内容
@@ -17,14 +17,15 @@ class MavenSpider(scrapy.Spider):
         for artifactory in artifactory_list:
             item = MavenItem()
             # 列表页数据
-            item['name'] = format_string(artifactory.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[@class=""]/text()').extract_first())
+            item['name'] = format_string(artifactory.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/text()').extract_first())
             item['description'] = format_string(artifactory.xpath('./div[@class="im-description"]/text()').extract_first())
-            item['usages'] = format_string(artifactory.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[@class="im-usage"]/b').extract_first())
-            item['link'] = self.detail_url_prefix + format_string(artifactory.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[@class=""]/@href').extract_first())
+            item['usages'] = format_string(artifactory.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[@class="im-usage"]/b/text()').extract_first())
+            item['link'] = self.detail_url_prefix + format_string(artifactory.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/@href').extract_first())
+
             # 如果获取到详情页
             if 'artifact' in item['link']:
                 # 请求详情页
-                yield scrapy.Request(item["href"], callback=self.parse_detail, meta={"item": item})
+                yield scrapy.Request(item["link"], callback=self.parse_detail, meta={"item": item})
             yield item
         # 查找下一页
         next_url = response.xpath('//*[@id="maincontent"]/ul[@class="search-nav"]/li[last()]/a/@href').extract_first()

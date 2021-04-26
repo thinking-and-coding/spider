@@ -100,3 +100,8 @@ HTTPCACHE_IGNORE_HTTP_CODES = [403]
 
 # 文件下载路径
 FILES_STORE = './Download/pdf'
+
+# 中间件配置
+SELENIUM_TIMEOUT = 10
+#PHANTOMJS_SERVICE_ARGS = ['--load-images=false','--disk-cache=true']
+PHANTOMJS_SERVICE_ARGS = []

@@ -8,6 +8,7 @@
 #     https://doc.scrapy.org/en/latest/topics/settings.html
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
+from spider.user_agent import get_random_agent
 
 BOT_NAME = 'spider'
 
@@ -16,7 +17,7 @@ NEWSPIDER_MODULE = 'spider.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Mozilla/5.0 (Windows NT 5.1; rv:5.0) Gecko/20100101 Firefox/5.0'
+USER_AGENT = get_random_agent()
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -43,7 +44,8 @@ DEFAULT_REQUEST_HEADERS = {
 #    'Accept': '*/*',
 #    'Accept-Language': 'zh',
 #    'Cookie': '__cfduid=d91a02f11c7ffb5f5095ff314a0881e171609764833'
-    'refer':'https://mvnrepository.com/'
+    'origin':'https://mvnrepository.com/',
+    'referer':'https://mvnrepository.com/'
 }
 
 # Enable or disable spider middlewares
@@ -54,9 +56,10 @@ DEFAULT_REQUEST_HEADERS = {
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
+DOWNLOADER_MIDDLEWARES = {
 #    'spider.middlewares.DoubanDownloaderMiddleware': 543,
-#}
+    'spider.middlewares.SeleniumMiddleware': 543,
+}
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html

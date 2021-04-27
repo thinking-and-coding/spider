@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import time
 # Define here the models for your spider middleware
 #
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
-import time
 from logging import getLogger
 
 from scrapy import signals
@@ -12,6 +12,7 @@ from scrapy.http import HtmlResponse
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium_stealth import stealth
 
 
 class DoubanSpiderMiddleware(object):
@@ -113,8 +114,23 @@ class SeleniumMiddleware(object):
     def __init__(self, timeout=None, service_args=[]):
         self.logger = getLogger(__name__)
         self.timeout = timeout
-        #self.browser = webdriver.PhantomJS(service_args=service_args)
+        # 抹掉无头浏览器特性
+        options = webdriver.ChromeOptions()
+        options.add_argument("start-maximized")
+        # options.add_argument("--headless")
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
         self.browser = webdriver.Chrome(service_args=service_args)
+        stealth(self.browser,
+                languages=["en-US", "en"],
+                vendor="Google Inc.",
+                platform="Win32",
+                webgl_vendor="Intel Inc.",
+                renderer="Intel Iris OpenGL Engine",
+                fix_hairline=True,
+                )
+
+        #self.browser = webdriver.PhantomJS(service_args=service_args)
         #self.browser.set_window_size(1400, 700)
         #self.browser.set_page_load_timeout(self.timeout)
         self.wait = WebDriverWait(self.browser, self.timeout)
@@ -134,7 +150,7 @@ class SeleniumMiddleware(object):
             self.logger.info('Url:' + request.url)
             # 获取页面
             self.browser.get(url=request.url)
-            time.sleep(3)
+            time.sleep(5)
             response = HtmlResponse(url=request.url, body=self.browser.page_source, request=request, encoding='utf-8', status=200)
             return response
         except TimeoutException:

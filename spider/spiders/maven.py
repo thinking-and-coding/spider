@@ -55,7 +55,7 @@ class MavenSpider(scrapy.Spider):
         for cite in cite_list:
             item["usedBy"].append(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[@class=""]/text()').extract_first())
             cite_link = self.detail_url_prefix + format_string(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[@class=""]/@href').extract_first())
-            item['citeLink'] = cite_link;
+            item['citeLink'] = cite_link
             yield scrapy.Request(url=cite_link, callback=self.parse_detail, dont_filter=True)
         # 下一页
         next_page = cite_link + response.xpath(

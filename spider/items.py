@@ -58,14 +58,16 @@ class MavenItem(Item):
     # 使用数
     usages = Field()
     # 链接
-    link = Field()
+    detail_link = Field()
     # 许可证
     license = Field()
     # 类别
     categories = Field()
     # 标签
     tags = Field()
+    # 引用链接
+    cite_url = Field()
     # maven坐标
     mavenSite = Field()
     # 被引列表
-    usedByList = Field()
+    usedBy = Field()

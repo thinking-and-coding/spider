@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import logging
 import time
 # Define here the models for your spider middleware
 #
@@ -113,6 +113,7 @@ class DoubanDownloaderMiddleware(object):
 class SeleniumMiddleware(object):
     def __init__(self, timeout=None, service_args=[]):
         self.logger = getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
         self.timeout = timeout
         # 抹掉无头浏览器特性
         options = webdriver.ChromeOptions()
@@ -145,9 +146,8 @@ class SeleniumMiddleware(object):
         :param spider: Spider对象
         :return: HtmlResponse
         """
-        self.logger.info('PhantomJS is Starting')
         try:
-            self.logger.info('Url:' + request.url)
+            self.logger.info('|->New Url:' + request.url)
             # 获取页面
             self.browser.get(url=request.url)
             time.sleep(5)

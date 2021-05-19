@@ -4,5 +4,5 @@
 
 def format_string(string):
     if string is not None:
-        return string.replace(' ', ' ').strip()
+        return string.replace(' ', ' ').replace('\n', ' ').strip()
     return ''

@@ -15,18 +15,11 @@ class MavenSpider(scrapy.Spider):
         # 解析内容
         artifactory_list = response.xpath('//div[@class="im"]')
         for artifactory in artifactory_list:
-            item = MavenItem()
-            # 列表页数据
-            item['name'] = format_string(artifactory.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/text()').extract_first())
-            item['description'] = format_string(artifactory.xpath('./div[@class="im-description"]/text()').extract_first())
-            item['usages'] = format_string(artifactory.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[@class="im-usage"]/b/text()').extract_first())
-            item['link'] = self.detail_url_prefix + format_string(artifactory.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/@href').extract_first())
-
+            detail_link = self.detail_url_prefix + format_string(artifactory.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/@href').extract_first())
             # 如果获取到详情页
-            if 'artifact' in item['link']:
+            if 'artifact' in detail_link:
                 # 请求详情页
-                yield scrapy.Request(item["link"], callback=self.parse_detail, meta={"item": item})
-            yield item
+                yield scrapy.Request(detail_link, callback=self.parse_detail)
         # 查找下一页
         next_url = response.xpath('//*[@id="maincontent"]/ul[@class="search-nav"]/li[last()]/a/@href').extract_first()
         if next_url is not None:
@@ -36,30 +29,42 @@ class MavenSpider(scrapy.Spider):
 
     # 获取详情页信息
     def parse_detail(self, response):
-        item = response.meta["item"]
-        # 获取详情页的内容、图片
-        item["license"] = response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/tr[1]/td").extract()
-        item["categories"] = response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/tr[2]/td").extract()
-        item["tags"] = response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/tr[3]/td/a/text()").extract()
-        # 详情页数据
-        yield item
-        # 处理引用数据
-        cite_url = self.detail_url_prefix + response.xpath("//*[@id='maincontent']/table/tbody/tr[last()]/td/a/@href").extract()
-        if cite_url is not None:
-            yield scrapy.Request(url=cite_url, callback=self.parse_cite, meta={"item": item})
+        item = MavenItem()
+        # 获取详情页数据
+        item['name'] = format_string(response.xpath("//*[@id='maincontent']/div[@class='im']/div[@class='im-header']/h2/a/text()").extract_first())
+        item['description'] = format_string(response.xpath("//*[@id='maincontent']/div[@class='im']/div[@class='im-description']/text()").extract_first())
+        item['usages'] = int(format_string(response.xpath("//*[@id='maincontent']/table/tbody/tr[last()]/td/a/b/text()").extract_first().split('\n')[0]).replace(',', ''))
+        item["license"] = format_string(response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/tr[1]/td/span/text()").extract_first())
+        item["categories"] = format_string(response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/tr[2]/td/a/text()").extract_first())
+        item["tags"] = format_string(response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/tr[3]/td/a/text()").extract_first())
+        # 只处理引用大于10的数据
+        if item['usages'] >= 10:
+            # 处理引用数据
+            cite_url = response.xpath("//*[@id='maincontent']/table/tbody/tr[last()]/td/a/@href").extract_first()
+            self.logger.info("|->cite_url:" + cite_url)
+            if cite_url is not None:
+                cite_url = self.detail_url_prefix + cite_url
+                item["cite_url"] = cite_url
+                yield scrapy.Request(url=cite_url, callback=self.parse_cite, meta={"item": item})
 
     def parse_cite(self, response):
         item = response.meta["item"]
         # 解析内容
         cite_list = response.xpath('//div[@class="im"]')
+        usedList = []
         for cite in cite_list:
-            item["usedBy"].append(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[@class=""]/text()').extract_first())
-            cite_link = self.detail_url_prefix + format_string(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[@class=""]/@href').extract_first())
-            item['citeLink'] = cite_link
-            yield scrapy.Request(url=cite_link, callback=self.parse_detail, dont_filter=True)
+            cite_name = format_string(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/text()').extract_first())
+            if cite_name is not None:
+                usedList.append(cite_name)
+            # 当前的包详情
+            detail_link = self.detail_url_prefix + format_string(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/@href').extract_first())
+            yield scrapy.Request(url=detail_link, callback=self.parse_detail, dont_filter=True)
+        item["usedBy"] = usedList
         # 下一页
-        next_page = cite_link + response.xpath(
-            '//*[@id="maincontent"]/ul[@class="search-nav"]/li[12]/a/@href').extract_first()
+        next_page = format_string(response.xpath('//*[@id="maincontent"]/ul[@class="search-nav"]/li[12]/a/@href').extract_first())
         if next_page is not None:
-            next_page = cite_link + next_page
+            cite_url = item["cite_url"]
+            next_page = cite_url + next_page
             yield scrapy.Request(url=next_page, callback=self.parse_cite, meta={"item": item})
+        # 没有下一页则说明当前页面数据采集完整了
+        yield item

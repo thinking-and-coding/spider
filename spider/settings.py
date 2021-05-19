@@ -8,7 +8,6 @@
 #     https://doc.scrapy.org/en/latest/topics/settings.html
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
-from spider.user_agent import get_random_agent
 
 BOT_NAME = 'spider'
 
@@ -25,12 +24,12 @@ USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 1
+CONCURRENT_REQUESTS = 16
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 10
+DOWNLOAD_DELAY = 1
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
@@ -61,6 +60,7 @@ DEFAULT_REQUEST_HEADERS = {
 DOWNLOADER_MIDDLEWARES = {
 #    'spider.middlewares.DoubanDownloaderMiddleware': 543,
     'spider.middlewares.SeleniumMiddleware': 543,
+    'scrapy_cloudflare_middleware.middlewares.CloudFlareMiddleware': 560
 }
 
 # Enable or disable extensions
@@ -107,3 +107,17 @@ FILES_STORE = './Download/pdf'
 SELENIUM_TIMEOUT = 10
 #PHANTOMJS_SERVICE_ARGS = ['--load-images=false','--disk-cache=true']
 PHANTOMJS_SERVICE_ARGS = []
+
+# 爬虫允许的最大深度，可以通过meta查看当前深度；0表示无深度
+DEPTH_LIMIT = 0
+
+# 爬取时，0表示深度优先Lifo(默认)；1表示广度优先FiFo
+# 后进先出，深度优先
+# DEPTH_PRIORITY = 0
+# SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleLifoDiskQueue'
+# SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.LifoMemoryQueue'
+
+# 先进先出，广度优先
+DEPTH_PRIORITY = 1
+SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleFifoDiskQueue'
+SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.FifoMemoryQueue'

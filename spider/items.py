@@ -70,4 +70,4 @@ class MavenItem(Item):
     # maven坐标
     mavenSite = Field()
     # 被引列表
-    usedBy = Field()
+    used = Field()

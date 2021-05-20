@@ -87,9 +87,11 @@ class mavenPipeline(FilesPipeline):
         self.file.close()
 
     def process_item(self, item, spider):
+        # set 转 list
+        item['used'] = list(item['used'])
         item = dict(item)
         print("|->artifact.name:", item.get('name'))
-        print("|->artifact.usedBy:", item.get('usedBy'))
+        print("|->artifact.used:", item.get('used'))
         line = json.dumps(item, ensure_ascii=False) + ',\n'
         self.file.write(line)
         return item

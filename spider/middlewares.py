@@ -112,13 +112,11 @@ class DoubanDownloaderMiddleware(object):
 
 class SeleniumMiddleware(object):
     def __init__(self, timeout=None, service_args=[]):
-        self.logger = getLogger(__name__)
-        self.logger.setLevel(logging.INFO)
         self.timeout = timeout
         # 抹掉无头浏览器特性
         options = webdriver.ChromeOptions()
         options.add_argument("start-maximized")
-        # options.add_argument("--headless")
+        options.add_argument("--headless")
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
         self.browser = webdriver.Chrome(service_args=service_args)
@@ -130,10 +128,6 @@ class SeleniumMiddleware(object):
                 renderer="Intel Iris OpenGL Engine",
                 fix_hairline=True,
                 )
-
-        #self.browser = webdriver.PhantomJS(service_args=service_args)
-        #self.browser.set_window_size(1400, 700)
-        #self.browser.set_page_load_timeout(self.timeout)
         self.wait = WebDriverWait(self.browser, self.timeout)
 
     def __del__(self):
@@ -147,14 +141,14 @@ class SeleniumMiddleware(object):
         :return: HtmlResponse
         """
         try:
-            self.logger.info('|->New Url:' + request.url)
+            spider.logger.info('|->New Url:' + request.url)
             # 获取页面
             self.browser.get(url=request.url)
-            time.sleep(5)
+            time.sleep(1)
             response = HtmlResponse(url=request.url, body=self.browser.page_source, request=request, encoding='utf-8', status=200)
             return response
         except TimeoutException:
-            self.logger.error('Timeout!')
+            spider.logger.error('Timeout!')
             return HtmlResponse(url=request.url, status=500, request=request)
 
     @classmethod

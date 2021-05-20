@@ -60,7 +60,7 @@ DEFAULT_REQUEST_HEADERS = {
 DOWNLOADER_MIDDLEWARES = {
 #    'spider.middlewares.DoubanDownloaderMiddleware': 543,
     'spider.middlewares.SeleniumMiddleware': 543,
-    'scrapy_cloudflare_middleware.middlewares.CloudFlareMiddleware': 560
+#    'scrapy_cloudflare_middleware.middlewares.CloudFlareMiddleware': 560
 }
 
 # Enable or disable extensions
@@ -113,9 +113,9 @@ DEPTH_LIMIT = 0
 
 # 爬取时，0表示深度优先Lifo(默认)；1表示广度优先FiFo
 # 后进先出，深度优先
-# DEPTH_PRIORITY = 0
-# SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleLifoDiskQueue'
-# SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.LifoMemoryQueue'
+#DEPTH_PRIORITY = 0
+#SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleLifoDiskQueue'
+#SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.LifoMemoryQueue'
 
 # 先进先出，广度优先
 DEPTH_PRIORITY = 1

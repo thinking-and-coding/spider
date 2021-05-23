@@ -72,5 +72,6 @@ class MavenSpider(scrapy.Spider):
             cite_url = item["cite_url"]
             next_page = urljoin(cite_url, next_page)
             yield scrapy.Request(url=next_page, callback=self.parse_cite, meta={"item": item}, priority=4)
-        # 没有下一页则说明当前页面数据采集完整了
-        yield item
+        else:
+            # 没有下一页则说明当前页面数据采集完整了
+            yield item

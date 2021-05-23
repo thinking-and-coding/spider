@@ -67,7 +67,5 @@ class MavenItem(Item):
     tags = Field()
     # 引用链接
     cite_url = Field()
-    # maven坐标
-    mavenSite = Field()
     # 被引列表
     used = Field()

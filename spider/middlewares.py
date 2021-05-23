@@ -141,7 +141,7 @@ class SeleniumMiddleware(object):
         :return: HtmlResponse
         """
         try:
-            spider.logger.info('|->New Url:' + request.url)
+            spider.logger.info(msg='|->New Url:' + request.url)
             # 获取页面
             self.browser.get(url=request.url)
             time.sleep(1)
@@ -150,7 +150,3 @@ class SeleniumMiddleware(object):
         except TimeoutException:
             spider.logger.error('Timeout!')
             return HtmlResponse(url=request.url, status=500, request=request)
-
-    @classmethod
-    def from_crawler(cls, crawler):
-        return cls()

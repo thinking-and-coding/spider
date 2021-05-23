@@ -77,6 +77,7 @@ ITEM_PIPELINES = {
     #'spider.pipelines.pdfPipeline': 300,
     #'spider.pipelines.pdfPipeline': 300,
     'spider.pipelines.mavenPipeline': 300,
+    'spider.pipelines.MavenNeo4jPipeline': 301,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -121,3 +122,8 @@ DEPTH_LIMIT = 0
 DEPTH_PRIORITY = 1
 SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleFifoDiskQueue'
 SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.FifoMemoryQueue'
+
+# Neo4j配置
+NEO4J_URI = "localhost:7687"
+NEO4J_USER = "neo4j"
+NEO4J_PASSWORD = "123456"

@@ -57,12 +57,13 @@ class MavenSpider(scrapy.Spider):
         cite_list = response.xpath('//div[@class="im"]')
         for cite in cite_list:
             cite_name = format_string(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/text()').extract_first())
-            if cite_name is not None:
+            if cite_name is not None and len(cite_name) != 0:
+                spider.logger.info(msg="|->cite_name:"+cite_name)
                 item["used"].add(cite_name)
-            # 当前的包详情
-            detail_link = format_string(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/@href').extract_first())
-            detail_link = urljoin(self.detail_url_prefix, detail_link)
-            yield scrapy.Request(url=detail_link, callback=self.parse_detail, dont_filter=True, priority=2)
+                # 当前的包详情
+                detail_link = format_string(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/@href').extract_first())
+                detail_link = urljoin(self.detail_url_prefix, detail_link)
+                yield scrapy.Request(url=detail_link, callback=self.parse_detail, priority=2)
         # 下一页
         next_page = format_string(response.xpath('//*[@id="maincontent"]/ul[@class="search-nav"]/li[12]/a/@href').extract_first())
         if next_page is not None:

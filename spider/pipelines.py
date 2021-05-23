@@ -94,8 +94,6 @@ class mavenPipeline(FilesPipeline):
         # set 转 list
         item['used'] = list(item['used'])
         item = dict(item)
-        print("|->artifact.name:", item.get('name'))
-        print("|->artifact.used:", item.get('used'))
         line = json.dumps(item, ensure_ascii=False) + ',\n'
         self.file.write(line)
         return item

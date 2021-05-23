@@ -79,8 +79,8 @@ ITEM_PIPELINES = {
     #'spider.pipelines.DoubanBookPipeline': 300,
     #'spider.pipelines.pdfPipeline': 300,
     #'spider.pipelines.pdfPipeline': 300,
-    'spider.pipelines.mavenPipeline': 300,
-    'spider.pipelines.MavenNeo4jPipeline': 301,
+    #'spider.pipelines.mavenPipeline': 300,
+    #'spider.pipelines.MavenNeo4jPipeline': 301,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -117,14 +117,14 @@ DEPTH_LIMIT = 0
 
 # 爬取时，0表示深度优先Lifo(默认)；1表示广度优先FiFo
 # 后进先出，深度优先
-#DEPTH_PRIORITY = 0
-#SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleLifoDiskQueue'
-#SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.LifoMemoryQueue'
+DEPTH_PRIORITY = 0
+SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleLifoDiskQueue'
+SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.LifoMemoryQueue'
 
 # 先进先出，广度优先
-DEPTH_PRIORITY = 1
-SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleFifoDiskQueue'
-SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.FifoMemoryQueue'
+#DEPTH_PRIORITY = 1
+#SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleFifoDiskQueue'
+#SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.FifoMemoryQueue'
 
 # Neo4j配置
 NEO4J_URI = "localhost:7687"

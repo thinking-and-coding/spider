@@ -143,7 +143,7 @@ class SeleniumMiddleware(object):
         :return: HtmlResponse
         """
         try:
-            spider.logger.info(msg='|->New Url:' + request.url)
+            spider.logger.info(msg='|->Url:' + request.url)
             # 获取页面
             self.browser.get(url=request.url)
             time.sleep(1)

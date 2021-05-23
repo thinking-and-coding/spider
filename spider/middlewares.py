@@ -117,9 +117,11 @@ class SeleniumMiddleware(object):
         options = webdriver.ChromeOptions()
         options.add_argument("start-maximized")
         options.add_argument("--headless")
+        extension_path = '/Users/wangziren/Library/Application Support/Google/Chrome/Default/Extensions/cfhdojbkjhnklbpkdaibdccddilifddb/3.11_0'
+        options.add_argument("load-extension=" + extension_path)
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
-        self.browser = webdriver.Chrome(service_args=service_args)
+        self.browser = webdriver.Chrome(service_args=service_args, options=options)
         stealth(self.browser,
                 languages=["en-US", "en"],
                 vendor="Google Inc.",

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
+from scrapy.utils import spider
 
 from spider.items import MavenItem
 from spider.string_utils import format_string
@@ -11,6 +12,7 @@ class MavenSpider(scrapy.Spider):
     start_urls = ['https://mvnrepository.com/popular']
     popular_url_prefix = 'https://mvnrepository.com/popular'
     detail_url_prefix = 'https://mvnrepository.com'
+    #spider.logger.setLevel('INFO')
 
     def parse(self, response, **kwargs):
         # 解析内容

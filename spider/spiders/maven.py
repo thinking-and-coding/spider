@@ -59,9 +59,9 @@ class MavenSpider(scrapy.Spider):
         # 获取详情页数据
         item['name'] = format_string(response.xpath("//*[@id='maincontent']/div[@class='im']/div[@class='im-header']/h2/a/text()").extract_first())
         item['description'] = format_string(response.xpath("//*[@id='maincontent']/div[@class='im']/div[@class='im-description']/text()").extract_first())
-        item["license"] = format_string(response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/tr[1]/td/span/text()").extract_first())
-        item["categories"] = format_string(response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/tr[2]/td/a/text()").extract_first())
-        item["tags"] = format_string(response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/tr[3]/td/a/text()").extract_first())
+        item["license"] = format_string(response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/*/td/span[@class='b lic']/text()").extract_first())
+        item["categories"] = response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/*/td/a[@class='b c']/text()").extract
+        item["tags"] = response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/*/td/a[@class='b tag']/text()").extract
         usages_block = response.xpath("//*[@id='maincontent']/table/tbody/tr[last()]/td/a/b/text()").extract_first()
         if usages_block is not None:
             item['usages'] = int(format_string(usages_block.split('\n')[0]).replace(',', ''))
@@ -94,11 +94,11 @@ class MavenSpider(scrapy.Spider):
                 spider.logger.info("|->parse_cite.detail_link:" + detail_link)
                 yield scrapy.Request(url=detail_link, callback=self.parse_detail, priority=3)
         # 下一页
-        next_page = format_string(response.xpath('//*[@id="maincontent"]/ul[@class="search-nav"]/li[12]/a/@href').extract_first())
+        next_page = format_string(response.xpath('//*[@id="maincontent"]/ul[@class="search-nav"]/li[last()]/a/@href').extract_first())
         if next_page is not None:
             cite_url = item["cite_url"]
             next_page = urljoin(cite_url, next_page)
-            delta_priority = next_page.split('=')[1]
+            delta_priority = next_page.split('=')[-1:]
             spider.logger.info("|->parse_cite.next_page:" + next_page + "delta_priority:" + delta_priority)
             yield scrapy.Request(url=next_page, callback=self.parse_cite, meta={"item": item}, priority=5+int(delta_priority))
         else:

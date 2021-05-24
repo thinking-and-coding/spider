@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
-import logging
 import time
 # Define here the models for your spider middleware
 #
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
-from logging import getLogger
-
 from scrapy import signals
 from scrapy.http import HtmlResponse
 from selenium import webdriver
@@ -143,7 +140,6 @@ class SeleniumMiddleware(object):
         :return: HtmlResponse
         """
         try:
-            spider.logger.info(msg='|->Url:' + request.url)
             # 获取页面
             self.browser.get(url=request.url)
             time.sleep(1)

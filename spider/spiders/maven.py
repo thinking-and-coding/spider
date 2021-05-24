@@ -29,7 +29,7 @@ class MavenSpider(scrapy.Spider):
         'LOG_LEVEL': 'INFO',
         'LOG_STDOUT': 'True',
         # 设置优先队列
-        'SCHEDULER_PRIORITY_QUEUE': 'queuelib.PriorityQueue',
+        'SCHEDULER_PRIORITY_QUEUE': 'scrapy.pqueues.ScrapyPriorityQueue',
     }
     # 设置最小引用数限制
     cite_limit = 1000
@@ -43,6 +43,7 @@ class MavenSpider(scrapy.Spider):
             detail_link = urljoin(self.detail_url_prefix, detail_link)
             # 如果获取到详情页
             if 'artifact' in detail_link:
+                spider.logger.info("|->parse.detail_link:" + detail_link)
                 # 请求详情页
                 yield scrapy.Request(detail_link, callback=self.parse_detail, priority=2)
         # 查找下一页
@@ -98,7 +99,7 @@ class MavenSpider(scrapy.Spider):
         if next_page is not None:
             cite_url = item["cite_url"]
             next_page = urljoin(cite_url, next_page)
-            delta_priority = next_page.split('=')[-1:]
+            delta_priority = next_page.split('=')[-1]
             spider.logger.info("|->parse_cite.next_page:" + next_page + "delta_priority:" + delta_priority)
             yield scrapy.Request(url=next_page, callback=self.parse_cite, meta={"item": item}, priority=5+int(delta_priority))
         else:

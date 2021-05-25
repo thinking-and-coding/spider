@@ -96,7 +96,7 @@ class MavenSpider(scrapy.Spider):
                 yield scrapy.Request(url=detail_link, callback=self.parse_detail, priority=3)
         # 下一页
         next_page = format_string(response.xpath('//*[@id="maincontent"]/ul[@class="search-nav"]/li[last()]/a/@href').extract_first())
-        if next_page is not None:
+        if next_page is not None and len(next_page) > 0:
             cite_url = item["cite_url"]
             next_page = urljoin(cite_url, next_page)
             delta_priority = next_page.split('=')[-1]

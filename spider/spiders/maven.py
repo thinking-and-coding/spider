@@ -17,8 +17,8 @@ class MavenSpider(scrapy.Spider):
     custom_settings = {
         # 设置管道下载
         'ITEM_PIPELINES': {
-            'spider.pipelines.mavenPipeline': 300,
-            'spider.pipelines.MavenNeo4jPipeline': 301,
+            'spider.pipelines.MavenNeo4jPipeline': 300,
+            'spider.pipelines.mavenPipeline': 301,
         },
         # Neo4j配置
         'NEO4J_URI': "localhost:7687",
@@ -61,10 +61,10 @@ class MavenSpider(scrapy.Spider):
         item['name'] = format_string(response.xpath("//*[@id='maincontent']/div[@class='im']/div[@class='im-header']/h2/a/text()").extract_first())
         item['description'] = format_string(response.xpath("//*[@id='maincontent']/div[@class='im']/div[@class='im-description']/text()").extract_first())
         item["license"] = format_string(response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/*/td/span[@class='b lic']/text()").extract_first())
-        item["categories"] = response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/*/td/a[@class='b c']/text()").extract
-        item["tags"] = response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/*/td/a[@class='b tag']/text()").extract
+        item["categories"] = ','.join(response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/*/td/a[@class='b c']/text()").extract())
+        item["tags"] = ','.join(response.xpath("//*[@id='maincontent']/table[@class='grid']/tbody/*/td/a[@class='b tag']/text()").extract())
         usages_block = response.xpath("//*[@id='maincontent']/table/tbody/tr[last()]/td/a/b/text()").extract_first()
-        if usages_block is not None:
+        if usages_block is not None and len(usages_block) > 0:
             item['usages'] = int(format_string(usages_block.split('\n')[0]).replace(',', ''))
         else:
             item['usages'] = 0
@@ -89,11 +89,15 @@ class MavenSpider(scrapy.Spider):
             if cite_name is not None and len(cite_name) != 0:
                 spider.logger.info(msg="|->cite_name:"+cite_name)
                 item["used"].add(cite_name)
-                # 当前的包详情
-                detail_link = format_string(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/@href').extract_first())
-                detail_link = urljoin(self.detail_url_prefix, detail_link)
-                spider.logger.info("|->parse_cite.detail_link:" + detail_link)
-                yield scrapy.Request(url=detail_link, callback=self.parse_detail, priority=3)
+                # 爬取大于引用数限制的详情页
+                usages = int(format_string(response.xpath("./div[@class='im-header']/h2[@class='im-title']/a[@class='im-usage']/b/text()").extract_first()).split(",", ""))
+                spider.logger.info("|->parse_cite.usages:" + usages)
+                if usages >= MavenSpider.cite_limit:
+                    # 当前的包详情
+                    detail_link = format_string(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/@href').extract_first())
+                    detail_link = urljoin(self.detail_url_prefix, detail_link)
+                    spider.logger.info("|->parse_cite.detail_link:" + detail_link)
+                    yield scrapy.Request(url=detail_link, callback=self.parse_detail, priority=3)
         # 下一页
         next_page = format_string(response.xpath('//*[@id="maincontent"]/ul[@class="search-nav"]/li[last()]/a/@href').extract_first())
         if next_page is not None and len(next_page) > 0:

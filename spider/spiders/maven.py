@@ -8,6 +8,7 @@ from spider.items import MavenItem
 from spider.string_utils import format_string
 from urllib.parse import urljoin
 
+
 class MavenSpider(scrapy.Spider):
     name = 'maven'
     allowed_domains = ['mvnrepository.com']
@@ -87,12 +88,12 @@ class MavenSpider(scrapy.Spider):
         for cite in cite_list:
             cite_name = format_string(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/text()').extract_first())
             if cite_name is not None and len(cite_name) != 0:
-                spider.logger.info(msg="|->cite_name:"+cite_name)
+                spider.logger.info(msg="|->cite_name:" + cite_name)
                 item["used"].add(cite_name)
                 # 爬取大于引用数限制的详情页
-                usages = int(format_string(response.xpath("./div[@class='im-header']/h2[@class='im-title']/a[@class='im-usage']/b/text()").extract_first()).split(",", ""))
+                usages = cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[@class="im-usage"]/b/text()').extract_first().replace(',', '')
                 spider.logger.info("|->parse_cite.usages:" + usages)
-                if usages >= MavenSpider.cite_limit:
+                if int(usages) >= MavenSpider.cite_limit:
                     # 当前的包详情
                     detail_link = format_string(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/@href').extract_first())
                     detail_link = urljoin(self.detail_url_prefix, detail_link)

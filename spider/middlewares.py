@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+
 # Define here the models for your spider middleware
 #
 # See documentation in:
@@ -113,8 +114,8 @@ class SeleniumMiddleware(object):
         # 抹掉无头浏览器特性
         options = webdriver.ChromeOptions()
         options.add_argument("start-maximized")
-        options.add_argument("--headless")
-        extension_path = '/Users/wangziren/Library/Application Support/Google/Chrome/Default/Extensions/cfhdojbkjhnklbpkdaibdccddilifddb/3.11_0'
+        #options.add_argument("--headless")
+        extension_path = '/Users/wangziren3/Library/Application Support/Google/Chrome/Default/Extensions/cfhdojbkjhnklbpkdaibdccddilifddb/3.11_0'
         options.add_argument("load-extension=" + extension_path)
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)

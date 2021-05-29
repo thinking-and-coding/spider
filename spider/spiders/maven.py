@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
-import json
+
+from urllib.parse import urljoin
 
 import scrapy
 from scrapy.utils import spider
+from scrapy_redis.spiders import RedisSpider
 
 from spider.items import MavenItem
 from spider.string_utils import format_string
-from urllib.parse import urljoin
 
 
-class MavenSpider(scrapy.Spider):
+# zadd maven:start_urls 1 https://mvnrepository.com/popular
+class MavenSpider(RedisSpider):
     name = 'maven'
     allowed_domains = ['mvnrepository.com']
     start_urls = ['https://mvnrepository.com/popular']

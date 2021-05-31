@@ -79,7 +79,7 @@ class MavenSpider(RedisSpider):
                 cite_url = urljoin(self.detail_url_prefix, cite_url)
                 # 保存引用链接和被引数据
                 item["cite_url"] = cite_url
-                item["used"] = set()
+                item["used"] = []
                 spider.logger.info("|->parse_detail.cite_url:" + cite_url)
                 yield scrapy.Request(url=cite_url, callback=self.parse_cite, meta={"item": item}, priority=4)
 
@@ -87,29 +87,37 @@ class MavenSpider(RedisSpider):
         item = response.meta["item"]
         # 解析内容
         cite_list = response.xpath('//div[@class="im"]')
+        process_next = True
         for cite in cite_list:
             cite_name = format_string(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/text()').extract_first())
             if cite_name is not None and len(cite_name) != 0:
                 spider.logger.info(msg="|->cite_name:" + cite_name)
-                item["used"].add(cite_name)
                 # 爬取大于引用数限制的详情页
                 usages = cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[@class="im-usage"]/b/text()').extract_first().replace(',', '')
                 spider.logger.info("|->parse_cite.usages:" + usages)
                 if int(usages) >= MavenSpider.cite_limit:
+                    # 保存引用关系
+                    item["used"].append(cite_name)
                     # 当前的包详情
                     detail_link = format_string(cite.xpath('./div[@class="im-header"]/h2[@class="im-title"]/a[1]/@href').extract_first())
                     detail_link = urljoin(self.detail_url_prefix, detail_link)
                     spider.logger.info("|->parse_cite.detail_link:" + detail_link)
                     yield scrapy.Request(url=detail_link, callback=self.parse_detail, priority=3)
-        # 下一页
-        next_page = format_string(response.xpath('//*[@id="maincontent"]/ul[@class="search-nav"]/li[last()]/a/@href').extract_first())
-        if next_page is not None and len(next_page) > 0:
-            cite_url = item["cite_url"]
-            next_page = urljoin(cite_url, next_page)
-            delta_priority = next_page.split('=')[-1]
-            spider.logger.info("|->parse_cite.next_page:" + next_page + "delta_priority:" + delta_priority)
-            yield scrapy.Request(url=next_page, callback=self.parse_cite, meta={"item": item}, priority=5+int(delta_priority))
-        else:
-            # 没有下一页则说明当前页面数据采集完整了
-            spider.logger.info("|->parse_cite generate item finished！")
-            yield item
+                else:
+                    process_next = False
+                    # 小于引用数则不再获取引用和详情
+                    yield item
+        # 处理下一页
+        if process_next:
+            # 下一页
+            next_page = format_string(response.xpath('//*[@id="maincontent"]/ul[@class="search-nav"]/li[last()]/a/@href').extract_first())
+            if next_page is not None and len(next_page) > 0:
+                cite_url = item["cite_url"]
+                next_page = urljoin(cite_url, next_page)
+                delta_priority = next_page.split('=')[-1]
+                spider.logger.info("|->parse_cite.next_page:" + next_page + "delta_priority:" + delta_priority)
+                yield scrapy.Request(url=next_page, callback=self.parse_cite, meta={"item": item}, priority=5+int(delta_priority))
+            else:
+                # 没有下一页则说明当前页面数据采集完整了
+                spider.logger.info("|->parse_cite generate item finished！")
+                yield item

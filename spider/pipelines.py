@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 
 import scrapy
 from neo4j import GraphDatabase
+from neo4j.exceptions import ConstraintError
 from scrapy.pipelines.files import FilesPipeline
 
 from spider.settings import *
@@ -114,12 +115,19 @@ class MavenNeo4jPipeline(object):
         spider.logger.info(msg='关闭neo4j数据库连接！')
 
     def process_item(self, item, spider):
+        # 引用去重
+        item['used'] = list(set(item['used']))
         item = dict(item)
         spider.logger.info(msg='当前保存的数据：' + json.dumps(item))
         with self.driver.session() as session:
-            # 保存节点全量信息
-            session.write_transaction(self.merge_node_full, item)
-            spider.logger.info(msg='保存节点数据完成，item：' + item.get("name"))
+            # 捕获重复节点异常
+            try:
+                # 保存节点全量信息
+                session.write_transaction(self.merge_node_full, item)
+                spider.logger.info(msg='保存节点数据完成，item：' + item.get("name"))
+            except ConstraintError:
+                spider.logger.info(msg='出现重复节点item：' + item.get("name") + ',进行更新操作！')
+                session.write_transaction(self.update_node, item)
             # 保存引用节点信息(如果节点只有简单信息则需要保存其他完整信息)
             cite_list = item.get('used')
             if cite_list is not None and len(cite_list) != 0:
@@ -132,15 +140,48 @@ class MavenNeo4jPipeline(object):
         return item
 
     def merge_node_full(self, tx, item):
-        return tx.run("MERGE (n:Item {name: $name,description: $description,usages:$usages,license:$license,"
-               "categories:$categories,tags:$tags,cite_url:$cite_url})",
-               name=item.get('name'), description=item.get('description'), usages=item.get('usages'),
-               license=item.get('license'), categories=item.get('categories'), tags=item.get('tags'), cite_url=item.get('cite_url'))
+        return tx.run('''
+                    MERGE (n:Item {name: $name}) 
+                    ON CREATE SET 
+                      n.description = $description,
+                      n.usages = $usages,
+                      n.license = $license,
+                      n.categories = $categories,
+                      n.tags = $tags,
+                      n.cite_url = $cite_url
+                    ON MATCH SET
+                      n.description = $description,
+                      n.usages = $usages,
+                      n.license = $license,
+                      n.categories = $categories,
+                      n.tags = $tags,
+                      n.cite_url = $cite_url
+                      ''',
+                      name=item.get('name'), description=item.get('description'), usages=item.get('usages'),
+                      license=item.get('license'), categories=item.get('categories'), tags=item.get('tags'),
+                      cite_url=item.get('cite_url'))
 
     def merge_node_partial(self, tx, name):
         return tx.run("MERGE (n:Item {name: $name})", name=name)
 
     def merge_relation(self, tx, node, cite_node):
-        return tx.run("MATCH (cite_node:Item{name:$cite_node}) "
-                      "MATCH (node:Item{name:$node}) "
-                      "MERGE (cite_node)-[:CITE]->(node)", node=node, cite_node=cite_node)
+        return tx.run('''
+                        MATCH (cite_node:Item{name:$cite_node}) 
+                        MATCH (node:Item{name:$node}) 
+                        MERGE (cite_node)-[:CITE]->(node)
+                        ''', node=node, cite_node=cite_node)
+
+    def update_node(self, tx, item):
+        return tx.run('''
+                        MATCH (node:Item{name:$name}) 
+                        SET 
+                            description = $description,
+                            usages = $usages,
+                            license = $license,
+                            categories = $categories,
+                            tags = $tags,
+                            cite_url = $cite_url
+                    ''',
+            name=item.get('name'), description=item.get('description'), usages=item.get('usages'),
+            license=item.get('license'), categories=item.get('categories'), tags=item.get('tags'),
+            cite_url=item.get('cite_url'))

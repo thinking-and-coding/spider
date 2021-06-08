@@ -2,6 +2,7 @@
 
 from urllib.parse import urljoin
 
+import cfscrape
 import scrapy
 from scrapy.utils import spider
 from scrapy_redis.spiders import RedisSpider
@@ -20,7 +21,7 @@ class MavenSpider(RedisSpider):
     custom_settings = {
         # 设置管道下载
         'ITEM_PIPELINES': {
-            'spider.pipelines.MavenNeo4jPipeline': 300,
+            #'spider.pipelines.MavenNeo4jPipeline': 300,
             'spider.pipelines.mavenPipeline': 301,
         },
         # Neo4j配置
@@ -28,7 +29,7 @@ class MavenSpider(RedisSpider):
         'NEO4J_USER': "neo4j",
         'NEO4J_PASSWORD': "123456",
         # 设置日志
-        'LOG_FILE': './log.txt',
+        #'LOG_FILE': './log.txt',
         'LOG_LEVEL': 'INFO',
         'LOG_STDOUT': 'True',
         # 设置优先队列
@@ -47,8 +48,9 @@ class MavenSpider(RedisSpider):
             # 如果获取到详情页
             if 'artifact' in detail_link:
                 spider.logger.info("|->parse.detail_link:" + detail_link)
+                token, agent = cfscrape.get_tokens(detail_link, 'Your prefarable user agent, _optional_')
                 # 请求详情页
-                yield scrapy.Request(detail_link, callback=self.parse_detail, priority=2)
+                yield scrapy.Request(detail_link, cookies=token, headers={'User-Agent': agent}, callback=self.parse_detail, priority=2)
         # 查找下一页
         next_url = response.xpath('//*[@id="maincontent"]/ul[@class="search-nav"]/li[last()]/a/@href').extract_first()
         if next_url is not None:
@@ -114,9 +116,8 @@ class MavenSpider(RedisSpider):
             if next_page is not None and len(next_page) > 0:
                 cite_url = item["cite_url"]
                 next_page = urljoin(cite_url, next_page)
-                delta_priority = next_page.split('=')[-1]
-                spider.logger.info("|->parse_cite.next_page:" + next_page + "delta_priority:" + delta_priority)
-                yield scrapy.Request(url=next_page, callback=self.parse_cite, meta={"item": item}, priority=5+int(delta_priority))
+                spider.logger.info("|->parse_cite.next_page:" + next_page)
+                yield scrapy.Request(url=next_page, callback=self.parse_cite, meta={"item": item}, priority=5)
             else:
                 # 没有下一页则说明当前页面数据采集完整了
                 spider.logger.info("|->parse_cite generate item finished！")

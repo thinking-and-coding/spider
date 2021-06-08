@@ -8,7 +8,7 @@
 #     https://doc.scrapy.org/en/latest/topics/settings.html
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
-from user_agent import get_random_agent
+from spider.user_agent import get_random_agent
 
 BOT_NAME = 'spider'
 

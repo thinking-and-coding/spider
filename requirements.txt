@@ -1,0 +1,5 @@
+Scrapy==2.4.1
+neo4j==4.2.1
+selenium_stealth==1.0.6
+selenium==3.141.0
+cryptography==3.3.1
